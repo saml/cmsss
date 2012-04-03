@@ -1,0 +1,5 @@
+*.swp
+build/
+env/
+*.pyc
+local_settings.py
