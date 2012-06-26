@@ -28,22 +28,37 @@ if (typeof String.prototype.f !== 'function') {
 }
 var getOnload = function(theFile) {
     return (function(e) {
-        var span = document.createElement('span');
-        span.innerHTML = '<img class="img" src="%s" title="%s" />'.f(e.target.result, escape(theFile.name));
-        document.getElementById('list').insertBefore(span, null);
+        var img = new Image();
+        
+        var canvas = document.createElement('canvas');
+        var cropped = new Image();
+
+        img.onload = function() {
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, 32, 32, 0, 0, 32, 32);
+            cropped.src = canvas.toDataURL();
+            document.getElementById('list').insertBefore(canvas, null);
+            document.getElementById('list').insertBefore(cropped, null);
+        };
+
+
+        img.src = e.target.result;
+        document.getElementById('list').insertBefore(img, null);
     });
 };
 var handleFileSelect = function(evt) {
+    document.getElementById('list').innerHTML = '';
     var files = evt.target.files;
     var output = [];
     var i = 0;
     var n = files.length;
-    var f;
-    while (f = files[i++]) {
-        if (!f.type.match('image.*')) {
+    window.f = null;
+    for (; i < n; i++) {
+        f = files[i];
+        if (!f.type.match(/image.*/)) {
             continue;
         }
-        var reader = new FileReader();
+        reader = new FileReader();
         reader.onload = getOnload(f);
         reader.readAsDataURL(f);
     }
